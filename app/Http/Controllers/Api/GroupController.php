@@ -130,26 +130,40 @@ class GroupController extends Controller
             'code' => 'required|string',
         ]);
 
-        // Implementasi kode join dapat disesuaikan
-        $group = Group::where('id', $validated['code'])->first();
+        $searchCode = strtoupper(trim($validated['code']));
+        \Log::info('Joining group with code: ' . $searchCode);
+
+        $group = Group::where('join_code', $searchCode)->first();
 
         if (!$group) {
+            \Log::warning('Group not found for code: ' . $searchCode);
             return response()->json([
                 'message' => 'Group not found'
             ], 404);
         }
 
+        \Log::info('Group found: ' . $group->id . ' (' . $group->name . ')');
+
         if ($group->isMember($request->user())) {
+            \Log::info('User ' . $request->user()->id . ' is already a member of group ' . $group->id);
             return response()->json([
                 'message' => 'Already a member of this group'
             ], 409);
         }
 
-        GroupMember::create([
-            'group_id' => $group->id,
-            'user_id' => $request->user()->id,
-            'role' => 'member',
-        ]);
+        try {
+            GroupMember::create([
+                'group_id' => $group->id,
+                'user_id' => $request->user()->id,
+                'role' => 'member',
+            ]);
+            \Log::info('User ' . $request->user()->id . ' successfully joined group ' . $group->id);
+        } catch (\Exception $e) {
+            \Log::error('Error joining group: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Internal server error'
+            ], 500);
+        }
 
         return response()->json([
             'message' => 'Joined group successfully',

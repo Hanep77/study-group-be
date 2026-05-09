@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 class Group extends Model
 {
@@ -15,10 +16,29 @@ class Group extends Model
     protected $fillable = [
         'creator_id',
         'name',
+        'join_code',
         'description',
         'deadline',
         'status',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($group) {
+            $group->join_code = static::generateUniqueCode();
+        });
+    }
+
+    public static function generateUniqueCode(): string
+    {
+        do {
+            $code = strtoupper(Str::random(6));
+        } while (static::where('join_code', $code)->exists());
+
+        return $code;
+    }
 
     protected $casts = [
         'deadline' => 'date',

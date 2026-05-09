@@ -24,12 +24,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // Groups
+    Route::post('/groups/join', [GroupController::class, 'join']);
     Route::get('/groups', [GroupController::class, 'index']);
     Route::post('/groups', [GroupController::class, 'store']);
     Route::get('/groups/{group}', [GroupController::class, 'show']);
     Route::put('/groups/{group}', [GroupController::class, 'update']);
     Route::delete('/groups/{group}', [GroupController::class, 'destroy']);
-    Route::post('/groups/join', [GroupController::class, 'join']);
     Route::post('/groups/{group}/leave', [GroupController::class, 'leave']);
     Route::get('/groups/{group}/members', [GroupController::class, 'members']);
 

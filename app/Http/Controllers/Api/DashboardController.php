@@ -18,10 +18,9 @@ class DashboardController extends Controller
         $tasksInProgressCount = $user->assignedTasks()->where('status', 'in_progress')->count();
         $tasksDoneCount = $user->assignedTasks()->where('status', 'done')->count();
 
-        $recentTasks = $user->assignedTasks()
+        $myTasks = $user->assignedTasks()
             ->with('group')
             ->orderBy('updated_at', 'desc')
-            ->limit(5)
             ->get();
 
         return response()->json([
@@ -29,7 +28,9 @@ class DashboardController extends Controller
             'tasks_todo_count' => $tasksTodoCount,
             'tasks_in_progress_count' => $tasksInProgressCount,
             'tasks_done_count' => $tasksDoneCount,
-            'recent_tasks' => $recentTasks,
+            'recent_tasks' => $myTasks->take(5), // Reuse myTasks for recent_tasks
+            'groups' => $user->groups()->with('creator', 'members')->get(),
+            'myTasks' => $myTasks,
         ]);
     }
 }

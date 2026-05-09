@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('creator_id')->constrained('users')->onDelete('cascade');
             $table->string('name');
+            $table->string('join_code')->unique();
             $table->text('description')->nullable();
             $table->date('deadline')->nullable();
             $table->enum('status', ['active', 'completed', 'archived'])->default('active');
