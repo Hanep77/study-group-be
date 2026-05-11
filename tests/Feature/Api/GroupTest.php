@@ -156,7 +156,7 @@ class GroupTest extends TestCase
         $group = Group::factory()->create();
 
         $response = $this->actingAs($user, 'sanctum')
-            ->postJson('/api/groups/join', ['code' => (string) $group->id]);
+            ->postJson('/api/groups/join', ['code' => $group->join_code]);
 
         $response->assertStatus(200);
         $this->assertDatabaseHas('group_members', [
